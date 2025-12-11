@@ -240,7 +240,7 @@ export function CredentalsForm() {
     <div className="flex flex-col gap-2 items-center mt-5">
       <Card className="w-full max-w-2xl">
         <CardHeader>
-          <CardTitle>Shopify Customer To Excel List 1.4</CardTitle>
+          <CardTitle>Shopify Customer To Excel List 1.5</CardTitle>
           <CardDescription>
             Download your Shopify store customers by providing your Shop URL and
             API Key.
