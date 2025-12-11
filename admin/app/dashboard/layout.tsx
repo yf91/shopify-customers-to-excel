@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { getServerSession } from "@/lib/get-session";
 import { redirect } from "next/navigation";
-import { signOutAction } from "@/actions/auth";
+import { AppSidebar } from "@/components/sidebar/app-sidebar";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { sidebarData } from "@/data/sidebar";
 
 export const metadata: Metadata = {
   title: "Dashboard - Shopify Customer Download",
@@ -20,15 +22,9 @@ export default async function DashboardLayout({
   }
 
   return (
-    <>
-      <h1>Dashboard</h1>
-      <>
-        <div>{session.user.username}</div>
-        <form action={signOutAction}>
-          <button type="submit">Sign Out</button>
-        </form>
-      </>
+    <SidebarProvider>
+      <AppSidebar user={session.user} sidebarData={sidebarData} />
       {children}
-    </>
+    </SidebarProvider>
   );
 }
