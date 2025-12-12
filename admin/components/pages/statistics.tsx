@@ -133,9 +133,9 @@ export default function Statistics({
   const [shop, setShop] = useState<string>("*");
   const [country, setCountry] = useState<string>("*");
   const [openStartDate, setOpenStartDate] = useState(false);
-  const [startDate, setStartDate] = useState<Date | undefined>(new Date());
+  const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [openEndDate, setOpenEndDate] = useState(false);
-  const [endDate, setEndDate] = useState<Date | undefined>(new Date());
+  const [endDate, setEndDate] = useState<Date | undefined>(undefined);
 
   const filteredData = chartData.filter((item) => {
     const date = new Date(item.date);
