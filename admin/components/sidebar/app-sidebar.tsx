@@ -37,7 +37,7 @@ export function AppSidebar({
     <Sidebar className="border-r-0" {...props} variant="floating">
       <SidebarHeader>
         <div
-          className="flex justify-center border-2 border-gray-200 p-2 rounded-lg hover:cursor-pointer"
+          className="flex justify-center hover:cursor-pointer"
           onClick={() => {
             router.push("/dashboard");
           }}

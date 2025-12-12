@@ -25,6 +25,7 @@ export function SignIn({ className, ...props }: React.ComponentProps<"div">) {
   } as SignInActionStateType);
 
   useEffect(() => {
+    console.log("SignIn state changed:", state);
     if (state.success) {
       toast.success(state.message);
       router.push("/dashboard");

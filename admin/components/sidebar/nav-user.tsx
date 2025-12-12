@@ -58,8 +58,8 @@ export function NavUser({
             sideOffset={4}
           >
             <DropdownMenuItem onClick={signOutAction}>
-              <LogOut />
-              Log out
+              <LogOut className="text-red-500" />
+              <span className="text-red-500">Log out</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
