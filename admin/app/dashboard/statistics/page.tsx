@@ -7,5 +7,5 @@ export default async function DashboardStatisticsPage() {
     fetchCountries(),
   ]);
 
-  return <Statistics shops={shops} countries={countries} />;
+  return <Statistics shops={shops} countries={countries} now={new Date()} />;
 }

@@ -125,17 +125,19 @@ const chartData = [
 export default function Statistics({
   shops,
   countries,
+  now,
 }: {
   shops: string[];
   countries: string[];
+  now: Date;
 }) {
   const [timeRange, setTimeRange] = useState("90d");
   const [shop, setShop] = useState<string>("*");
   const [country, setCountry] = useState<string>("*");
   const [openStartDate, setOpenStartDate] = useState(false);
-  const [startDate, setStartDate] = useState<Date | undefined>(undefined);
+  const [startDate, setStartDate] = useState<Date | undefined>(now);
   const [openEndDate, setOpenEndDate] = useState(false);
-  const [endDate, setEndDate] = useState<Date | undefined>(undefined);
+  const [endDate, setEndDate] = useState<Date | undefined>(now);
 
   const filteredData = chartData.filter((item) => {
     const date = new Date(item.date);
@@ -151,15 +153,17 @@ export default function Statistics({
     return date >= startDate;
   });
 
-  const setDates = useEffectEvent(() => {
-    const t = new Date();
-    setStartDate(t);
-    setEndDate(t);
-  });
+  //   const setDates = useEffectEvent(() => {
+  //     const t = new Date();
+  //     setStartDate(t);
+  //     setEndDate(t);
+  //   });
 
-  useEffect(() => {
-    setDates();
-  }, []);
+  //   useEffect(() => {
+  //     const t = new Date();
+  //     setStartDate(t);
+  //     setEndDate(t);
+  //   }, []);
 
   const { status, data, error, isFetching } = useQuery({
     queryKey: [
