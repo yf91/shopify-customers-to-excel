@@ -152,7 +152,13 @@ export default function Statistics({
   });
 
   const { status, data, error, isFetching } = useQuery({
-    queryKey: ["customers", startDate, endDate, country, shop],
+    queryKey: [
+      "customers",
+      startDate?.toISOString(),
+      endDate?.toISOString(),
+      country,
+      shop,
+    ],
     queryFn: async () => {
       //   const response = await fetch(
       //     "https://api.github.com/repos/TanStack/query"
@@ -160,8 +166,8 @@ export default function Statistics({
       //   return await response.json();
       await new Promise((resolve) => setTimeout(resolve, 2000));
       return {
-        startDate: startDate,
-        endDate: endDate,
+        startDate: startDate?.toISOString(),
+        endDate: endDate?.toISOString(),
         country: country,
         shop: shop,
       };
