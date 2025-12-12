@@ -42,7 +42,7 @@ export function AppSidebar({
             router.push("/dashboard");
           }}
         >
-          <span className="text-xl font-bold">💠 Dashboard 1.0</span>
+          <span className="text-xl font-bold">💠 Dashboard 1.1</span>
         </div>
       </SidebarHeader>
       <SidebarContent>
