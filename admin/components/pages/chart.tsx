@@ -58,13 +58,13 @@ export function ChartAreaInteractive({
         </div>
       </CardHeader>
       <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
-        <ChartContainer
-          config={chartConfig}
-          className="aspect-auto h-62.5 w-full"
-        >
-          {isFetching ? (
-            <Spinner />
-          ) : (
+        {isFetching ? (
+          <Spinner />
+        ) : (
+          <ChartContainer
+            config={chartConfig}
+            className="aspect-auto h-62.5 w-full"
+          >
             <AreaChart data={data}>
               <defs>
                 <linearGradient id="fillDesktop" x1="0" y1="0" x2="0" y2="1">
@@ -137,8 +137,8 @@ export function ChartAreaInteractive({
               />
               <ChartLegend content={<ChartLegendContent />} />
             </AreaChart>
-          )}
-        </ChartContainer>
+          </ChartContainer>
+        )}
       </CardContent>
     </Card>
   );
