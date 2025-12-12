@@ -10,7 +10,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { ChartAreaInteractive } from "./chart";
-import { useState } from "react";
+import { useEffect, useEffectEvent, useState } from "react";
 import {
   Select,
   SelectContent,
@@ -133,9 +133,9 @@ export default function Statistics({
   const [shop, setShop] = useState<string>("*");
   const [country, setCountry] = useState<string>("*");
   const [openStartDate, setOpenStartDate] = useState(false);
-  const [startDate, setStartDate] = useState<Date | undefined>(new Date());
+  const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [openEndDate, setOpenEndDate] = useState(false);
-  const [endDate, setEndDate] = useState<Date | undefined>(new Date());
+  const [endDate, setEndDate] = useState<Date | undefined>(undefined);
 
   const filteredData = chartData.filter((item) => {
     const date = new Date(item.date);
@@ -151,6 +151,16 @@ export default function Statistics({
     return date >= startDate;
   });
 
+  const setDates = useEffectEvent(() => {
+    const t = new Date();
+    setStartDate(t);
+    setEndDate(t);
+  });
+
+  useEffect(() => {
+    setDates();
+  }, []);
+
   const { status, data, error, isFetching } = useQuery({
     queryKey: [
       "customers",
@@ -164,7 +174,6 @@ export default function Statistics({
       //     "https://api.github.com/repos/TanStack/query"
       //   );
       //   return await response.json();
-      await new Promise((resolve) => setTimeout(resolve, 2000));
       return {
         startDate: startDate?.toISOString(),
         endDate: endDate?.toISOString(),
