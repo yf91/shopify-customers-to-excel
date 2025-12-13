@@ -1,16 +1,33 @@
-import "dotenv/config";
-// import { PrismaPg } from "@prisma/adapter-pg";
-// import { PrismaClient } from "@/prisma/generated/client";
+import { PrismaClient } from "../prisma/generated/client";
+import { PrismaPg } from "@prisma/adapter-pg";
 
-// const connectionString = `${process.env.DATABASE_URL}`;
+// PrismaClient is attached to the `global` object in development to prevent
+// exhausting your database connection limit.
+//
+// Learn more:
+// https://pris.ly/d/help/next-js-best-practices
 
-// const adapter = new PrismaPg({ connectionString });
-// const prisma = new PrismaClient({ adapter });
+const globalForPrisma = globalThis as unknown as {
+  prisma: PrismaClient | undefined;
+};
 
-// export { prisma };
-import { PrismaClient } from "@/prisma/generated/client";
-import { withAccelerate } from "@prisma/extension-accelerate";
+let prisma: PrismaClient;
 
-export const prisma = new PrismaClient({
-  accelerateUrl: process.env.DATABASE_URL!,
-}).$extends(withAccelerate());
+const adapter = new PrismaPg({
+  connectionString: process.env.DATABASE_URL,
+});
+
+if (process.env.NODE_ENV === "production") {
+  prisma = new PrismaClient({
+    adapter,
+  });
+} else {
+  if (!globalForPrisma.prisma) {
+    globalForPrisma.prisma = new PrismaClient({
+      adapter,
+    });
+  }
+  prisma = globalForPrisma.prisma;
+}
+
+export { prisma };

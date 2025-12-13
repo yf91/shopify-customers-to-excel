@@ -43,6 +43,5 @@ export async function fetchStatistics(
       shop: shop !== "*" ? shop : undefined,
     },
   });
-
   return customers;
 }

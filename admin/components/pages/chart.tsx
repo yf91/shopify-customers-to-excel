@@ -25,8 +25,8 @@ import { ShopifyCustomer } from "@/prisma/generated/client";
 export const description = "An interactive area chart";
 
 const chartConfig = {
-  visitors: {
-    label: "Visitors",
+  customers: {
+    label: "Customers",
   },
   desktop: {
     label: "Desktop",
@@ -95,7 +95,7 @@ export function ChartAreaInteractive({
               </defs>
               <CartesianGrid vertical={false} />
               <XAxis
-                dataKey="date"
+                dataKey="addedAt"
                 tickLine={false}
                 axisLine={false}
                 tickMargin={8}
@@ -123,17 +123,10 @@ export function ChartAreaInteractive({
                 }
               />
               <Area
-                dataKey="mobile"
+                dataKey="customers"
                 type="natural"
                 fill="url(#fillMobile)"
                 stroke="var(--color-mobile)"
-                stackId="a"
-              />
-              <Area
-                dataKey="desktop"
-                type="natural"
-                fill="url(#fillDesktop)"
-                stroke="var(--color-desktop)"
                 stackId="a"
               />
               <ChartLegend content={<ChartLegendContent />} />
