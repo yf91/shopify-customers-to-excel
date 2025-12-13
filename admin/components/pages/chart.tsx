@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/chart";
 import { Button } from "../ui/button";
 import { Spinner } from "../ui/spinner";
+import { ShopifyCustomer } from "@/prisma/generated/client";
 
 export const description = "An interactive area chart";
 
@@ -41,7 +42,7 @@ export function ChartAreaInteractive({
   data,
   isFetching,
 }: {
-  data: { date: string; desktop: number; mobile: number }[];
+  data: ShopifyCustomer[];
   isFetching: boolean;
 }) {
   return (

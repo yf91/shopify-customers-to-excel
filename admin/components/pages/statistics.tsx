@@ -27,6 +27,7 @@ import { Calendar } from "../ui/calendar";
 import { Button } from "../ui/button";
 import { ChevronDownIcon } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import { fetchStatistics } from "@/actions/statistics";
 
 const chartData = [
   { date: "2024-04-01", desktop: 222, mobile: 150 },
@@ -125,19 +126,17 @@ const chartData = [
 export default function Statistics({
   shops,
   countries,
-  now,
 }: {
   shops: string[];
   countries: string[];
-  now: Date;
 }) {
   const [timeRange, setTimeRange] = useState("90d");
   const [shop, setShop] = useState<string>("*");
   const [country, setCountry] = useState<string>("*");
   const [openStartDate, setOpenStartDate] = useState(false);
-  const [startDate, setStartDate] = useState<Date | undefined>(now);
+  const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [openEndDate, setOpenEndDate] = useState(false);
-  const [endDate, setEndDate] = useState<Date | undefined>(now);
+  const [endDate, setEndDate] = useState<Date | undefined>(undefined);
 
   const filteredData = chartData.filter((item) => {
     const date = new Date(item.date);
@@ -153,17 +152,15 @@ export default function Statistics({
     return date >= startDate;
   });
 
-  //   const setDates = useEffectEvent(() => {
-  //     const t = new Date();
-  //     setStartDate(t);
-  //     setEndDate(t);
-  //   });
+  const setDates = useEffectEvent(() => {
+    const t = new Date();
+    setStartDate(t);
+    setEndDate(t);
+  });
 
-  //   useEffect(() => {
-  //     const t = new Date();
-  //     setStartDate(t);
-  //     setEndDate(t);
-  //   }, []);
+  useEffect(() => {
+    setDates();
+  }, []);
 
   const { status, data, error, isFetching } = useQuery({
     queryKey: [
@@ -178,12 +175,8 @@ export default function Statistics({
       //     "https://api.github.com/repos/TanStack/query"
       //   );
       //   return await response.json();
-      return {
-        startDate: startDate?.toISOString(),
-        endDate: endDate?.toISOString(),
-        country: country,
-        shop: shop,
-      };
+      const data = await fetchStatistics(startDate, endDate, country, shop);
+      return data;
     },
   });
 
@@ -307,7 +300,7 @@ export default function Statistics({
           </Select>
           <Button>Apply</Button>
         </div>
-        <ChartAreaInteractive data={filteredData} isFetching={isFetching} />
+        <ChartAreaInteractive data={data} isFetching={isFetching} />
       </div>
     </SidebarInset>
   );
