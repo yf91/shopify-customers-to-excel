@@ -310,7 +310,6 @@ function SelectShop({
     refetchOnWindowFocus: false,
     //staleTime: 50000,
     queryFn: async () => {
-      await new Promise((resolve) => setTimeout(resolve, 5000));
       const data = await fetchShops();
       return data;
     },
@@ -377,7 +376,6 @@ function SelectCountry({
     refetchOnWindowFocus: false,
     staleTime: 50_000,
     queryFn: async () => {
-      await new Promise((resolve) => setTimeout(resolve, 5000));
       const data = await fetchCountries();
       return data;
     },
