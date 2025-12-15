@@ -373,7 +373,7 @@ export type ShopifyCustomerCreateInput = {
   defaultAddressAddress1: string
   defaultAddressCity: string
   defaultAddressCountry: string
-  addedAt?: Date | string
+  addedAt: Date | string
 }
 
 export type ShopifyCustomerUncheckedCreateInput = {
@@ -392,7 +392,7 @@ export type ShopifyCustomerUncheckedCreateInput = {
   defaultAddressAddress1: string
   defaultAddressCity: string
   defaultAddressCountry: string
-  addedAt?: Date | string
+  addedAt: Date | string
 }
 
 export type ShopifyCustomerUpdateInput = {
@@ -449,7 +449,7 @@ export type ShopifyCustomerCreateManyInput = {
   defaultAddressAddress1: string
   defaultAddressCity: string
   defaultAddressCountry: string
-  addedAt?: Date | string
+  addedAt: Date | string
 }
 
 export type ShopifyCustomerUpdateManyMutationInput = {

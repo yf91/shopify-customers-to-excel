@@ -10,7 +10,14 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { ChartAreaInteractive } from "./chart";
-import { useEffect, useEffectEvent, useState } from "react";
+import {
+  use,
+  useEffect,
+  useEffectEvent,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   Select,
   SelectContent,
@@ -131,8 +138,6 @@ import { Skeleton } from "../ui/skeleton";
 // ];
 
 export default function Statistics() {
-  const [shops, setShops] = useState<string[]>([]);
-  const [countries, setCountries] = useState<string[]>([]);
   const [selectedShop, setSelectedShop] = useState<string>("*");
   const [selectedCountry, setSelectedCountry] = useState<string>("*");
   const [openStartDate, setOpenStartDate] = useState(false);
@@ -147,8 +152,6 @@ export default function Statistics() {
   } = useQuery({
     queryKey: ["customers"],
     enabled: false,
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
     queryFn: async () => {
       const data = await fetchStatistics(
         startDate,
@@ -159,6 +162,7 @@ export default function Statistics() {
       return data;
     },
   });
+
   //   const filteredData = chartData.filter((item) => {
   //     const date = new Date(item.date);
   //     const referenceDate = new Date("2024-06-30");
@@ -318,12 +322,19 @@ function SelectShop({
     <>
       {isFetchingShops ? (
         <Skeleton>
-          <Select disabled value={selectedShop}>
+          <Select disabled>
             <SelectTrigger
               className="hidden rounded-lg sm:flex"
               aria-label="Select a value"
             >
-              <SelectValue placeholder="Select a shop" />
+              <SelectValue
+                placeholder={
+                  <div className="flex gap-2 items-center justify-center">
+                    <Spinner />
+                    Loading
+                  </div>
+                }
+              />
             </SelectTrigger>
             <SelectContent className="rounded-xl">
               <SelectItem key="all" value="*">
@@ -384,12 +395,19 @@ function SelectCountry({
     <>
       {isFetchingCountries ? (
         <Skeleton>
-          <Select disabled value={selectedCountry}>
+          <Select disabled>
             <SelectTrigger
               className="hidden rounded-lg sm:flex"
               aria-label="Select a value"
             >
-              <SelectValue placeholder="Select a country" />
+              <SelectValue
+                placeholder={
+                  <div className="flex gap-2 items-center justify-center">
+                    <Spinner />
+                    Loading
+                  </div>
+                }
+              />
             </SelectTrigger>
             <SelectContent className="rounded-xl">
               <SelectItem key="all" value="*">
