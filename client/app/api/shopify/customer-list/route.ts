@@ -84,6 +84,18 @@ export async function POST(request: NextRequest) {
         cursor: string;
         node: ShopifyCustomer;
       }[];
+      const now = new Date();
+      const addedAt = new Date(
+        Date.UTC(
+          now.getUTCFullYear(),
+          now.getUTCMonth(),
+          now.getUTCDate(),
+          0,
+          0,
+          0,
+          0
+        )
+      );
       const customers = edges.map((e) => e.node);
       const filteredCustomers = customers.filter((c) => c.email);
       await prisma.shopifyCustomer.createMany({
@@ -102,6 +114,7 @@ export async function POST(request: NextRequest) {
           defaultAddressAddress1: customer.defaultAddress?.address1 || "",
           defaultAddressCity: customer.defaultAddress?.city || "",
           defaultAddressCountry: customer.defaultAddress?.country || "",
+          addedAt: addedAt,
         })),
         skipDuplicates: true,
       });

@@ -91,5 +91,5 @@ model ShopifyCustomer {
   defaultAddressAddress1  String
   defaultAddressCity      String
   defaultAddressCountry   String
-  addedAt                 DateTime @default(now())
+  addedAt                 DateTime
 }
