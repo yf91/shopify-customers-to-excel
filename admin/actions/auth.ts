@@ -3,6 +3,7 @@
 import { auth } from "@/lib/auth";
 import { SignInActionStateType } from "@/types/auth";
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
 // export async function signUpAction() {
 //   try {
@@ -36,7 +37,7 @@ export async function signInAction(
         password: password, // required
       },
     });
-    return { success: true, message: "Sign-in successful" };
+    // return { success: true, message: "Sign-in successful" };
   } catch (error) {
     if (error instanceof Error) {
       console.error("Error during sign-in:", error.message);
@@ -46,6 +47,8 @@ export async function signInAction(
       message: "Sign-in failed",
     };
   }
+
+  return redirect("/dashboard");
 }
 
 export async function signOutAction() {
@@ -59,4 +62,6 @@ export async function signOutAction() {
     }
     throw new Error("Sign-out failed");
   }
+
+  return redirect("/sign-in");
 }

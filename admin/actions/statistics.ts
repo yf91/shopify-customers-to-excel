@@ -1,6 +1,5 @@
 "use server";
 
-import { fetchCountriesDB, fetchShopsDB } from "@/database/statistics";
 import { getServerSession } from "@/lib/get-session";
 import { prisma } from "@/lib/prisma";
 
@@ -9,16 +8,38 @@ export async function fetchShops() {
   if (!user) {
     throw new Error("Unauthorized");
   }
-  const shops = await fetchShopsDB();
+  const shops = await prisma.shopifyCustomer.findMany({
+    where: {
+      shop: {
+        not: "",
+      },
+    },
+    distinct: ["shop"],
+    select: {
+      shop: true,
+    },
+  });
   return shops.map((shop) => shop.shop);
 }
 
 export async function fetchCountries() {
+  console.time("fetchCountries");
   const user = await getServerSession();
   if (!user) {
     throw new Error("Unauthorized");
   }
-  const countries = await fetchCountriesDB();
+  console.timeEnd("fetchCountries");
+  const countries = await prisma.shopifyCustomer.findMany({
+    where: {
+      defaultAddressCountry: {
+        not: "",
+      },
+    },
+    distinct: ["defaultAddressCountry"],
+    select: {
+      defaultAddressCountry: true,
+    },
+  });
   return countries.map((country) => country.defaultAddressCountry);
 }
 

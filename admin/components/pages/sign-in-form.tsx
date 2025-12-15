@@ -11,28 +11,33 @@ import {
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { signInAction } from "@/actions/auth";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useActionState, useEffect } from "react";
 import { Spinner } from "../ui/spinner";
 import { SignInActionStateType } from "@/types/auth";
 
-export function SignIn({ className, ...props }: React.ComponentProps<"div">) {
-  const router = useRouter();
+export function SignInForm({
+  className,
+  ...props
+}: React.ComponentProps<"div">) {
+  // const router = useRouter();
   const [state, formAction, isPending] = useActionState(signInAction, {
     success: null,
     message: "",
   } as SignInActionStateType);
 
   useEffect(() => {
-    console.log("SignIn state changed:", state);
-    if (state.success) {
-      toast.success(state.message);
-      router.push("/dashboard");
-    } else if (state.success === false && state.message) {
+    // if (state.success) {
+    //   toast.success(state.message);
+    //   router.push("/dashboard");
+    // } else if (state.success === false && state.message) {
+    //   toast.error(state.message);
+    // }
+    if (state.success === false && state.message) {
       toast.error(state.message);
     }
-  }, [state, router]);
+  }, [state]);
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>

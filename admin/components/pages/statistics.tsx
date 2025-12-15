@@ -27,8 +27,14 @@ import { Calendar } from "../ui/calendar";
 import { Button } from "../ui/button";
 import { ChevronDownIcon } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { fetchStatistics } from "@/actions/statistics";
+import {
+  fetchShops,
+  fetchCountries,
+  fetchStatistics,
+} from "@/actions/statistics";
 import { toast } from "sonner";
+import { Spinner } from "../ui/spinner";
+import { Skeleton } from "../ui/skeleton";
 
 // const chartData = [
 //   { date: "2024-04-01", desktop: 222, mobile: 150 },
@@ -124,27 +130,32 @@ import { toast } from "sonner";
 //   { date: "2024-06-30", desktop: 446, mobile: 400 },
 // ];
 
-export default function Statistics({
-  shops,
-  countries,
-}: {
-  shops: string[];
-  countries: string[];
-}) {
-  //   const [timeRange, setTimeRange] = useState("90d");
-  const [shop, setShop] = useState<string>("*");
-  const [country, setCountry] = useState<string>("*");
+export default function Statistics() {
+  const [shops, setShops] = useState<string[]>([]);
+  const [countries, setCountries] = useState<string[]>([]);
+  const [selectedShop, setSelectedShop] = useState<string>("*");
+  const [selectedCountry, setSelectedCountry] = useState<string>("*");
   const [openStartDate, setOpenStartDate] = useState(false);
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [openEndDate, setOpenEndDate] = useState(false);
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
-  const { data, error, isFetching, refetch } = useQuery({
+  const {
+    data: customers,
+    error: fetchingCustomersError,
+    isFetching: isFetchingCustomers,
+    refetch: refetchCustomers,
+  } = useQuery({
     queryKey: ["customers"],
     enabled: false,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
     queryFn: async () => {
-      const data = await fetchStatistics(startDate, endDate, country, shop);
+      const data = await fetchStatistics(
+        startDate,
+        endDate,
+        selectedShop,
+        selectedCountry
+      );
       return data;
     },
   });
@@ -173,10 +184,12 @@ export default function Statistics({
   }, []);
 
   useEffect(() => {
-    if (error) {
-      toast.error("Error fetching statistics: " + error.message);
+    if (fetchingCustomersError) {
+      toast.error(
+        "Error fetching statistics: " + fetchingCustomersError.message
+      );
     }
-  }, [error]);
+  }, [fetchingCustomersError]);
 
   return (
     <SidebarInset>
@@ -260,7 +273,53 @@ export default function Statistics({
               />
             </PopoverContent>
           </Popover>
-          <Select value={shop} onValueChange={setShop}>
+          <SelectShop
+            selectedShop={selectedShop}
+            setSelectedShop={setSelectedShop}
+          />
+          <SelectCountry
+            selectedCountry={selectedCountry}
+            setSelectedCountry={setSelectedCountry}
+          />
+          <Button onClick={() => refetchCustomers()}>Apply</Button>
+        </div>
+        <ChartAreaInteractive
+          data={customers ?? []}
+          isFetching={isFetchingCustomers}
+        />
+      </div>
+    </SidebarInset>
+  );
+}
+
+function SelectShop({
+  selectedShop,
+  setSelectedShop,
+}: {
+  selectedShop: string;
+  setSelectedShop: (shop: string) => void;
+}) {
+  const {
+    data: shops,
+    error: fetchingShopsError,
+    isFetching: isFetchingShops,
+  } = useQuery({
+    queryKey: ["shops"],
+    //enabled: false,
+    // refetchOnMount: true,
+    refetchOnWindowFocus: false,
+    //staleTime: 50000,
+    queryFn: async () => {
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+      const data = await fetchShops();
+      return data;
+    },
+  });
+  return (
+    <>
+      {isFetchingShops ? (
+        <Skeleton>
+          <Select disabled value={selectedShop}>
             <SelectTrigger
               className="hidden rounded-lg sm:flex"
               aria-label="Select a value"
@@ -271,35 +330,98 @@ export default function Statistics({
               <SelectItem key="all" value="*">
                 All Shops
               </SelectItem>
-              {shops.map((shop) => (
-                <SelectItem key={shop} value={shop}>
-                  {shop}
-                </SelectItem>
-              ))}
             </SelectContent>
           </Select>
-          <Select value={country} onValueChange={setCountry}>
+        </Skeleton>
+      ) : (
+        <Select value={selectedShop} onValueChange={setSelectedShop}>
+          <SelectTrigger
+            className="hidden rounded-lg sm:flex"
+            aria-label="Select a value"
+          >
+            <SelectValue placeholder="Select a shop" />
+          </SelectTrigger>
+          <SelectContent className="rounded-xl">
+            <SelectItem key="all" value="*">
+              All Shops
+            </SelectItem>
+            {shops
+              ? shops.map((shop) => (
+                  <SelectItem key={shop} value={shop}>
+                    {shop}
+                  </SelectItem>
+                ))
+              : null}
+          </SelectContent>
+        </Select>
+      )}
+    </>
+  );
+}
+
+function SelectCountry({
+  selectedCountry,
+  setSelectedCountry,
+}: {
+  selectedCountry: string;
+  setSelectedCountry: (country: string) => void;
+}) {
+  const {
+    data: countries,
+    error: fetchingShopsError,
+    isFetching: isFetchingCountries,
+  } = useQuery({
+    queryKey: ["countries"],
+    // enabled: false,
+    // refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    staleTime: 50_000,
+    queryFn: async () => {
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+      const data = await fetchCountries();
+      return data;
+    },
+  });
+  return (
+    <>
+      {isFetchingCountries ? (
+        <Skeleton>
+          <Select disabled value={selectedCountry}>
             <SelectTrigger
               className="hidden rounded-lg sm:flex"
               aria-label="Select a value"
             >
-              <SelectValue placeholder="Select a shop" />
+              <SelectValue placeholder="Select a country" />
             </SelectTrigger>
             <SelectContent className="rounded-xl">
               <SelectItem key="all" value="*">
                 All Countries
               </SelectItem>
-              {countries.map((country) => (
-                <SelectItem key={country} value={country}>
-                  {country}
-                </SelectItem>
-              ))}
             </SelectContent>
           </Select>
-          <Button onClick={() => refetch()}>Apply</Button>
-        </div>
-        <ChartAreaInteractive data={data ?? []} isFetching={isFetching} />
-      </div>
-    </SidebarInset>
+        </Skeleton>
+      ) : (
+        <Select value={selectedCountry} onValueChange={setSelectedCountry}>
+          <SelectTrigger
+            className="hidden rounded-lg sm:flex"
+            aria-label="Select a value"
+          >
+            <SelectValue placeholder="Select a country" />
+          </SelectTrigger>
+          <SelectContent className="rounded-xl">
+            <SelectItem key="all" value="*">
+              All Countries
+            </SelectItem>
+            {countries
+              ? countries.map((country) => (
+                  <SelectItem key={country} value={country}>
+                    {country}
+                  </SelectItem>
+                ))
+              : null}
+          </SelectContent>
+        </Select>
+      )}
+    </>
   );
 }
