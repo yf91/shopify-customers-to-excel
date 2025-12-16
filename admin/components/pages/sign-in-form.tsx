@@ -16,7 +16,6 @@ import { signInAction } from "@/actions/auth";
 import { toast } from "sonner";
 import { useActionState, useEffect } from "react";
 import { Spinner } from "../ui/spinner";
-import { SignInActionStateType } from "@/types/auth";
 
 export function SignInForm({
   className,

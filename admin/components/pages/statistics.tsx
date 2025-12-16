@@ -10,14 +10,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { ChartAreaInteractive } from "./chart";
-import {
-  use,
-  useEffect,
-  useEffectEvent,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { use, useEffect, useEffectEvent, useState } from "react";
 import {
   Select,
   SelectContent,
@@ -38,6 +31,7 @@ import {
   fetchShops,
   fetchCountries,
   fetchStatistics,
+  fetchCustomer,
 } from "@/actions/statistics";
 import { toast } from "sonner";
 import { Spinner } from "../ui/spinner";
@@ -137,25 +131,49 @@ import { Skeleton } from "../ui/skeleton";
 //   { date: "2024-06-30", desktop: 446, mobile: 400 },
 // ];
 
+// function countCustomersByDate(
+//   data: CustomerDataType[]
+// ): GroupedCustomerDataType[] {
+//   const map = new Map<string, number>();
+
+//   for (const item of data) {
+//     // Convert Date to YYYY-MM-DD
+//     const dateKey = item.addedAt.toISOString().split("T")[0];
+
+//     map.set(dateKey, (map.get(dateKey) ?? 0) + 1);
+//   }
+
+//   return Array.from(map.entries())
+//     .map(([addedAt, count]) => ({
+//       addedAt,
+//       count,
+//     }))
+//     .sort(
+//       (a, b) => new Date(a.addedAt).getTime() - new Date(b.addedAt).getTime()
+//     );
+// }
+
 export default function Statistics() {
   const [selectedShop, setSelectedShop] = useState<string>("*");
   const [selectedCountry, setSelectedCountry] = useState<string>("*");
-  const [openStartDate, setOpenStartDate] = useState(false);
-  const [startDate, setStartDate] = useState<Date | undefined>(undefined);
-  const [openEndDate, setOpenEndDate] = useState(false);
-  const [endDate, setEndDate] = useState<Date | undefined>(undefined);
+  const [selectedStartDate, setSelectedStartDate] = useState<Date | undefined>(
+    undefined
+  );
+  const [selectedEndDate, setSelectedEndDate] = useState<Date | undefined>(
+    undefined
+  );
   const {
-    data: customers,
-    error: fetchingCustomersError,
-    isFetching: isFetchingCustomers,
-    refetch: refetchCustomers,
+    data: statisticsData,
+    error: fetchingStatisticsDataError,
+    isFetching: isFetchingStatisticsData,
+    refetch: refetchStatisticsData,
   } = useQuery({
-    queryKey: ["customers"],
+    queryKey: ["statistics"],
     enabled: false,
     queryFn: async () => {
       const data = await fetchStatistics(
-        startDate,
-        endDate,
+        selectedStartDate,
+        selectedEndDate,
         selectedShop,
         selectedCountry
       );
@@ -163,37 +181,23 @@ export default function Statistics() {
     },
   });
 
-  //   const filteredData = chartData.filter((item) => {
-  //     const date = new Date(item.date);
-  //     const referenceDate = new Date("2024-06-30");
-  //     let daysToSubtract = 90;
-  //     if (timeRange === "30d") {
-  //       daysToSubtract = 30;
-  //     } else if (timeRange === "7d") {
-  //       daysToSubtract = 7;
-  //     }
-  //     const startDate = new Date(referenceDate);
-  //     startDate.setDate(startDate.getDate() - daysToSubtract);
-  //     return date >= startDate;
-  //   });
-
-  const setDates = useEffectEvent(() => {
-    const t = new Date();
-    setStartDate(t);
-    setEndDate(t);
-  });
+  async function fetchCustomerData() {
+    const data = await fetchCustomer(
+      selectedStartDate,
+      selectedEndDate,
+      selectedShop,
+      selectedCountry
+    );
+    return data;
+  }
 
   useEffect(() => {
-    setDates();
-  }, []);
-
-  useEffect(() => {
-    if (fetchingCustomersError) {
+    if (fetchingStatisticsDataError) {
       toast.error(
-        "Error fetching statistics: " + fetchingCustomersError.message
+        "Error fetching statistics: " + fetchingStatisticsDataError.message
       );
     }
-  }, [fetchingCustomersError]);
+  }, [fetchingStatisticsDataError]);
 
   return (
     <SidebarInset>
@@ -223,96 +227,145 @@ export default function Statistics() {
       </header>
       <div className="flex flex-1 flex-col gap-4 px-4 py-10">
         <div className="flex flex-row gap-2 items-center justify-end">
-          <Popover open={openStartDate} onOpenChange={setOpenStartDate}>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                id="startDate"
-                className="w-48 justify-between font-normal"
-              >
-                {startDate
-                  ? startDate.toLocaleDateString()
-                  : "Select start date"}
-                <ChevronDownIcon />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent
-              className="w-auto overflow-hidden p-0"
-              align="start"
-            >
-              <Calendar
-                mode="single"
-                selected={startDate}
-                captionLayout="dropdown"
-                onSelect={(date) => {
-                  setStartDate(date);
-                  setOpenStartDate(false);
-                }}
-              />
-            </PopoverContent>
-          </Popover>
-          <Popover open={openEndDate} onOpenChange={setOpenEndDate}>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                id="endDate"
-                className="w-48 justify-between font-normal"
-              >
-                {endDate ? endDate.toLocaleDateString() : "Select end date"}
-                <ChevronDownIcon />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent
-              className="w-auto overflow-hidden p-0"
-              align="start"
-            >
-              <Calendar
-                mode="single"
-                selected={endDate}
-                captionLayout="dropdown"
-                onSelect={(date) => {
-                  setEndDate(date);
-                  setOpenEndDate(false);
-                }}
-              />
-            </PopoverContent>
-          </Popover>
+          <SelectStartDate
+            selectedStartDate={selectedStartDate}
+            setSelectedStartDate={setSelectedStartDate}
+            isFetching={isFetchingStatisticsData}
+          />
+          <SelectEndDate
+            selectedEndDate={selectedEndDate}
+            setSelectedEndDate={setSelectedEndDate}
+            isFetching={isFetchingStatisticsData}
+          />
           <SelectShop
             selectedShop={selectedShop}
             setSelectedShop={setSelectedShop}
+            isFetching={isFetchingStatisticsData}
           />
           <SelectCountry
             selectedCountry={selectedCountry}
             setSelectedCountry={setSelectedCountry}
+            isFetching={isFetchingStatisticsData}
           />
-          <Button onClick={() => refetchCustomers()}>Apply</Button>
+          <Button
+            onClick={() => refetchStatisticsData()}
+            disabled={
+              isFetchingStatisticsData || !selectedStartDate || !selectedEndDate
+            }
+          >
+            Search
+          </Button>
         </div>
         <ChartAreaInteractive
-          data={customers ?? []}
-          isFetching={isFetchingCustomers}
+          data={statisticsData ?? []}
+          isFetchingStatisticsData={isFetchingStatisticsData}
+          fetchCustomerData={fetchCustomerData}
         />
       </div>
     </SidebarInset>
   );
 }
 
+function SelectStartDate({
+  selectedStartDate,
+  setSelectedStartDate,
+  isFetching,
+}: {
+  selectedStartDate: Date | undefined;
+  setSelectedStartDate: (date: Date | undefined) => void;
+  isFetching: boolean;
+}) {
+  const [openStartDate, setOpenStartDate] = useState(false);
+
+  return (
+    <>
+      <Popover open={openStartDate} onOpenChange={setOpenStartDate}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            id="startDate"
+            className="w-48 justify-between font-normal"
+            disabled={isFetching}
+          >
+            {selectedStartDate
+              ? selectedStartDate.toISOString().split("T")[0]
+              : "Select start date"}
+            <ChevronDownIcon />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto overflow-hidden p-0" align="start">
+          <Calendar
+            mode="single"
+            selected={selectedStartDate}
+            captionLayout="dropdown"
+            onSelect={(date) => {
+              setSelectedStartDate(date);
+              setOpenStartDate(false);
+            }}
+            timeZone="UTC"
+          />
+        </PopoverContent>
+      </Popover>
+    </>
+  );
+}
+
+function SelectEndDate({
+  selectedEndDate,
+  setSelectedEndDate,
+  isFetching,
+}: {
+  selectedEndDate: Date | undefined;
+  setSelectedEndDate: (date: Date | undefined) => void;
+  isFetching: boolean;
+}) {
+  const [openEndDate, setOpenEndDate] = useState(false);
+
+  return (
+    <>
+      <Popover open={openEndDate} onOpenChange={setOpenEndDate}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            id="endDate"
+            className="w-48 justify-between font-normal"
+            disabled={isFetching}
+          >
+            {selectedEndDate
+              ? selectedEndDate.toISOString().split("T")[0]
+              : "Select end date"}
+            <ChevronDownIcon />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto overflow-hidden p-0" align="start">
+          <Calendar
+            mode="single"
+            selected={selectedEndDate}
+            captionLayout="dropdown"
+            onSelect={(date) => {
+              setSelectedEndDate(date);
+              setOpenEndDate(false);
+            }}
+            timeZone="UTC"
+          />
+        </PopoverContent>
+      </Popover>
+    </>
+  );
+}
+
 function SelectShop({
   selectedShop,
   setSelectedShop,
+  isFetching,
 }: {
   selectedShop: string;
   setSelectedShop: (shop: string) => void;
+  isFetching: boolean;
 }) {
-  const {
-    data: shops,
-    error: fetchingShopsError,
-    isFetching: isFetchingShops,
-  } = useQuery({
+  const { data: shops, isFetching: isFetchingShops } = useQuery({
     queryKey: ["shops"],
-    //enabled: false,
-    // refetchOnMount: true,
     refetchOnWindowFocus: false,
-    //staleTime: 50000,
     queryFn: async () => {
       const data = await fetchShops();
       return data;
@@ -344,7 +397,11 @@ function SelectShop({
           </Select>
         </Skeleton>
       ) : (
-        <Select value={selectedShop} onValueChange={setSelectedShop}>
+        <Select
+          value={selectedShop}
+          onValueChange={setSelectedShop}
+          disabled={isFetching}
+        >
           <SelectTrigger
             className="hidden rounded-lg sm:flex"
             aria-label="Select a value"
@@ -372,20 +429,15 @@ function SelectShop({
 function SelectCountry({
   selectedCountry,
   setSelectedCountry,
+  isFetching,
 }: {
   selectedCountry: string;
   setSelectedCountry: (country: string) => void;
+  isFetching: boolean;
 }) {
-  const {
-    data: countries,
-    error: fetchingShopsError,
-    isFetching: isFetchingCountries,
-  } = useQuery({
+  const { data: countries, isFetching: isFetchingCountries } = useQuery({
     queryKey: ["countries"],
-    // enabled: false,
-    // refetchOnMount: false,
     refetchOnWindowFocus: false,
-    staleTime: 50_000,
     queryFn: async () => {
       const data = await fetchCountries();
       return data;
@@ -417,7 +469,11 @@ function SelectCountry({
           </Select>
         </Skeleton>
       ) : (
-        <Select value={selectedCountry} onValueChange={setSelectedCountry}>
+        <Select
+          value={selectedCountry}
+          onValueChange={setSelectedCountry}
+          disabled={isFetching}
+        >
           <SelectTrigger
             className="hidden rounded-lg sm:flex"
             aria-label="Select a value"

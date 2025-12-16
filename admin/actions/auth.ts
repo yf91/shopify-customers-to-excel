@@ -1,7 +1,6 @@
 "use server";
 
 import { auth } from "@/lib/auth";
-import { SignInActionStateType } from "@/types/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
