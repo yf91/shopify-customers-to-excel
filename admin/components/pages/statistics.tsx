@@ -10,7 +10,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { ChartAreaInteractive } from "./chart";
-import { use, useEffect, useEffectEvent, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Select,
   SelectContent,
@@ -172,8 +172,8 @@ export default function Statistics() {
     enabled: false,
     queryFn: async () => {
       const data = await fetchStatistics(
-        selectedStartDate,
-        selectedEndDate,
+        selectedStartDate?.toISOString(),
+        selectedEndDate?.toISOString(),
         selectedShop,
         selectedCountry
       );
@@ -183,8 +183,8 @@ export default function Statistics() {
 
   async function fetchCustomerData() {
     const data = await fetchCustomer(
-      selectedStartDate,
-      selectedEndDate,
+      selectedStartDate?.toISOString(),
+      selectedEndDate?.toISOString(),
       selectedShop,
       selectedCountry
     );

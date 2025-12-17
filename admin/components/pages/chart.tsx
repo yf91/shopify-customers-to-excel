@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
+import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 
 import {
   Card,
@@ -23,7 +23,6 @@ import { Spinner } from "../ui/spinner";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import JSZip from "jszip";
-import { Tooltip } from "../ui/tooltip";
 
 export const description = "An interactive area chart";
 

@@ -56,44 +56,22 @@ export async function fetchCountries() {
 }
 
 export async function fetchCustomer(
-  fromDate: Date | undefined,
-  toDate: Date | undefined,
+  fromDateISO: string | undefined,
+  toDateISO: string | undefined,
   country: string,
   shop: string
 ) {
   const user = await getServerSession();
   if (!user) throw new Error("Unauthorized");
 
+  const fromDate = fromDateISO ? new Date(fromDateISO) : undefined;
+  const toDate = toDateISO ? new Date(toDateISO) : undefined;
+
+  if (fromDate && toDate && toDate < fromDate) {
+    return [];
+  }
+
   const PAGE_SIZE = 25000;
-
-  // // Match your original UTC normalization
-  // const fromUTC = fromDate
-  //   ? new Date(
-  //       Date.UTC(
-  //         fromDate.getUTCFullYear(),
-  //         fromDate.getUTCMonth(),
-  //         fromDate.getUTCDate(),
-  //         0,
-  //         0,
-  //         0,
-  //         0
-  //       )
-  //     )
-  //   : undefined;
-
-  // const toUTC = toDate
-  //   ? new Date(
-  //       Date.UTC(
-  //         toDate.getUTCFullYear(),
-  //         toDate.getUTCMonth(),
-  //         toDate.getUTCDate(),
-  //         23,
-  //         59,
-  //         59,
-  //         999
-  //       )
-  //     )
-  //   : undefined;
 
   let cursor: string | undefined = undefined;
   const customers: CustomerDataType[] = [];
@@ -148,8 +126,8 @@ export async function fetchCustomer(
 }
 
 export async function fetchStatistics(
-  fromDate: Date | undefined,
-  toDate: Date | undefined,
+  fromDateISO: string | undefined,
+  toDateISO: string | undefined,
   country: string,
   shop: string
 ) {
@@ -157,25 +135,32 @@ export async function fetchStatistics(
   if (!user) {
     throw new Error("Unauthorized");
   }
+
+  const fromDate = fromDateISO ? new Date(fromDateISO) : undefined;
+  const toDate = toDateISO ? new Date(toDateISO) : undefined;
+
+  if (fromDate && toDate && toDate < fromDate) {
+    return [];
+  }
+
   const whereParts: Prisma.Sql[] = [];
   if (fromDate) {
     // Use real Date objects (recommended), not string-built timestamps
     whereParts.push(Prisma.sql`"addedAt" >= ${fromDate}`);
   }
+
   if (toDate) {
     // Use real Date objects (recommended), not string-built timestamps
     whereParts.push(Prisma.sql`"addedAt" <= ${toDate}`);
   }
+
   if (shop !== "*") {
     whereParts.push(Prisma.sql`"shop" = ${shop}`);
   }
+
   if (country !== "*") {
     whereParts.push(Prisma.sql`"defaultAddressCountry" = ${country}`);
   }
-  // if (fromDate && toDate) {
-  //   // Use real Date objects (recommended), not string-built timestamps
-  //   whereParts.push(Prisma.sql`"addedAt" BETWEEN ${fromDate} AND ${toDate}`);
-  // }
 
   const whereSql =
     whereParts.length > 0
@@ -185,9 +170,26 @@ export async function fetchStatistics(
   const result = await prisma.$queryRaw<
     { count: bigint; addedAt: Date }[]
   >`SELECT Count("email"), "addedAt" FROM public."ShopifyCustomer" ${whereSql} group by "addedAt" order by "addedAt" asc`;
-  console.log("Statistics count result:", result);
-  return result.map((item) => ({
-    count: Number(item.count),
-    addedAt: item.addedAt.toISOString(),
+
+  const tmpArr: { addedAt: string; count: number }[] = [];
+  if (fromDate && toDate) {
+    const tmpDate = new Date(fromDate);
+    while (tmpDate <= toDate) {
+      tmpArr.push({ addedAt: tmpDate.toISOString(), count: 0 });
+      tmpDate.setDate(tmpDate.getDate() + 1);
+    }
+  }
+
+  // Create a map from result for quick lookup
+  const resultMap = new Map(
+    result.map((item) => [item.addedAt.toISOString(), Number(item.count)])
+  );
+
+  // Merge result into tmpArr
+  const mergedData = tmpArr.map((item) => ({
+    addedAt: item.addedAt,
+    count: resultMap.get(item.addedAt) ?? item.count,
   }));
+
+  return mergedData;
 }
