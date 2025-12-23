@@ -174,8 +174,8 @@ export default function Statistics() {
       const data = await fetchStatistics(
         selectedStartDate?.toISOString(),
         selectedEndDate?.toISOString(),
-        selectedShop,
-        selectedCountry
+        selectedCountry,
+        selectedShop
       );
       return data;
     },
@@ -185,8 +185,8 @@ export default function Statistics() {
     const data = await fetchCustomer(
       selectedStartDate?.toISOString(),
       selectedEndDate?.toISOString(),
-      selectedShop,
-      selectedCountry
+      selectedCountry,
+      selectedShop
     );
     return data;
   }
