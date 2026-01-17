@@ -9,9 +9,9 @@ const query = `query CustomerCount {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { shop, apiKey, variables } = body;
+    const { shop, accessToken, variables } = body;
 
-    if (!shop || !apiKey) {
+    if (!shop || !accessToken) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }
@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "X-Shopify-Access-Token": apiKey,
+        "X-Shopify-Access-Token": accessToken,
       },
       body: JSON.stringify({
         query,

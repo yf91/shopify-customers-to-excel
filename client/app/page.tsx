@@ -1,5 +1,5 @@
-import { CredentalsForm } from "@/components/CredentialsForm";
+import { redirect } from "next/navigation";
 
-export default function Home() {
-  return <CredentalsForm />;
+export default async function DashboardPage() {
+  redirect("/dashboard");
 }

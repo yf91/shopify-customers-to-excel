@@ -55,6 +55,7 @@ export const ModelName = {
   Session: 'Session',
   Account: 'Account',
   Verification: 'Verification',
+  Shop: 'Shop',
   ShopifyCustomer: 'ShopifyCustomer'
 } as const
 
@@ -132,6 +133,21 @@ export const VerificationScalarFieldEnum = {
 } as const
 
 export type VerificationScalarFieldEnum = (typeof VerificationScalarFieldEnum)[keyof typeof VerificationScalarFieldEnum]
+
+
+export const ShopScalarFieldEnum = {
+  id: 'id',
+  shop: 'shop',
+  clientId: 'clientId',
+  clientSecret: 'clientSecret',
+  accessToken: 'accessToken',
+  scope: 'scope',
+  userId: 'userId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ShopScalarFieldEnum = (typeof ShopScalarFieldEnum)[keyof typeof ShopScalarFieldEnum]
 
 
 export const ShopifyCustomerScalarFieldEnum = {

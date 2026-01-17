@@ -37,13 +37,13 @@ const query = `
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { shop, apiKey, variables } = body;
+    const { shop, accessToken, variables } = body;
 
-    const result = shopifyFormSchema.safeParse({ shop, apiKey });
+    // const result = shopifyFormSchema.safeParse({ shop, accessToken });
 
-    if (!result.success) {
-      return NextResponse.json({ error: "Invalid form data" }, { status: 400 });
-    }
+    // if (!result.success) {
+    //   return NextResponse.json({ error: "Invalid form data" }, { status: 400 });
+    // }
 
     const SHOPIFY_ENDPOINT = `https://${shop}/admin/api/${API_VERSION}/graphql.json`;
 
@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "X-Shopify-Access-Token": apiKey,
+        "X-Shopify-Access-Token": accessToken,
       },
       body: JSON.stringify({
         query,

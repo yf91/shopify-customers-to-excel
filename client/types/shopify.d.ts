@@ -28,3 +28,11 @@ export type ShopifyFormState = {
   >;
   success: boolean;
 };
+
+type ConnectShopFormState = {
+  errors: {
+    shop?: string[];
+    clientId?: string[];
+    clientSecret?: string[];
+  };
+};

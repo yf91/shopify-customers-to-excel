@@ -18,6 +18,7 @@ model User {
   updatedAt     DateTime  @updatedAt
   sessions      Session[]
   accounts      Account[]
+  shops         Shop[]
 
   username        String?
   displayUsername String?
@@ -75,6 +76,22 @@ model Verification {
   @@map("verification")
 }
 
+model Shop {
+  id           String   @id @default(cuid())
+  shop         String   @unique
+  clientId     String
+  clientSecret String
+  accessToken  String?
+  scope        String?
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([userId])
+  @@map("shop")
+}
+
 model ShopifyCustomer {
   id                      String   @id @default(cuid())
   shop                    String   @default("")
@@ -93,3 +110,5 @@ model ShopifyCustomer {
   defaultAddressCountry   String
   addedAt                 DateTime
 }
+
+
