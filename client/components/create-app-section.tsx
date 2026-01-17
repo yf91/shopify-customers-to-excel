@@ -31,7 +31,7 @@ export function CreateAppSection() {
       </CardHeader>
       <CardContent className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 items-start">
         <span className="font-bold text-yellow-400">App Name:</span>
-        <span>Supportify</span>
+        <span>Smartify</span>
 
         <span className="font-bold text-yellow-400">App URL*:</span>
         <span className="flex items-center gap-2">
