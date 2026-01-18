@@ -106,9 +106,10 @@ export function ShopsTable({ userId }: { userId: string }) {
           <TableFooter>
             {!!selectedShop && (
               <ExportCustomersDialog
+                key={selectedShop.id}
                 open={dialogOpen}
                 setOpen={setDialogOpen}
-                shop={selectedShop!}
+                shop={selectedShop}
               />
             )}
             <TableRow>

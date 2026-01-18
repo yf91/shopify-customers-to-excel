@@ -27,6 +27,7 @@ export function ExportCustomersDialog({
   setOpen: (open: boolean) => void;
   shop: Shop;
 }) {
+  console.log("ExportCustomersDialog render for shop:", shop.shop);
   const [customers, setCustomers] = useState<ShopifyCustomer[]>([]);
   const [customerCount, setCustomerCount] = useState<number>(0);
   const [fetching, setFetching] = useState(false);
@@ -235,43 +236,45 @@ export function ExportCustomersDialog({
             </div>
           )}
         </div>
-        <div className="flex flex-col gap-2">
-          <span>
-            <span className="font-bold"> {customers.length} </span>
-            customers were found in your Shopify store.
-          </span>
-          <div className="flex items-start gap-2">
-            <Checkbox
-              id="split-customers"
-              disabled={customers.length === 0 || processDownload || fetching}
-              checked={customerSplitChecked}
-              onCheckedChange={(value) =>
-                setCustomerSplitChecked(value === true)
-              }
-            />
-            <div className="grid gap-2">
-              <Label htmlFor="split-customers">
-                Split customers by country
-              </Label>
+        {customers.length > 0 && !fetching && (
+          <div className="flex flex-col gap-2">
+            <span>
+              <span className="font-bold"> {customers.length} </span>
+              customers were found in your Shopify store.
+            </span>
+            <div className="flex items-start gap-2">
+              <Checkbox
+                id="split-customers"
+                disabled={customers.length === 0 || processDownload || fetching}
+                checked={customerSplitChecked}
+                onCheckedChange={(value) =>
+                  setCustomerSplitChecked(value === true)
+                }
+              />
+              <div className="grid gap-2">
+                <Label htmlFor="split-customers">
+                  Split customers by country
+                </Label>
+              </div>
             </div>
+            <Button
+              disabled={customers.length === 0 || processDownload || fetching}
+              onClick={exportCustomers}
+            >
+              {processDownload ? (
+                <>
+                  <div className="w-5 h-5 mr-2 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Prepare and download...
+                </>
+              ) : (
+                <>
+                  <Download className="h-5 w-5 mr-2" />
+                  Download Customers
+                </>
+              )}
+            </Button>
           </div>
-          <Button
-            disabled={customers.length === 0 || processDownload || fetching}
-            onClick={exportCustomers}
-          >
-            {processDownload ? (
-              <>
-                <div className="w-5 h-5 mr-2 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                Prepare and download...
-              </>
-            ) : (
-              <>
-                <Download className="h-5 w-5 mr-2" />
-                Download Customers
-              </>
-            )}
-          </Button>
-        </div>
+        )}
       </DialogContent>
     </Dialog>
   );
